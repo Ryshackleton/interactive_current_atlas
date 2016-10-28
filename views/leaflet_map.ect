@@ -1,0 +1,47 @@
+
+<!-- load the template layout -->
+<% extend 'layout' %>
+
+<!-- main page content -->
+<div id='leaflet_map'></div>
+
+<% block 'local_css' : %>
+    <!--  CSS for Leaflet     -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
+
+    <!-- CSS to accompany location control in map (the little blue dot showing where you are!) -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://domoritz.github.io/leaflet-locatecontrol/dist/L.Control.Locate.min.css" />
+
+    <link href=" /assets/css/leaflet_local.css" rel="stylesheet" />
+<% end %>
+
+<% block 'page_scripts' : %>
+    <!-- Javascript leaflet packages -->
+     <script src="https://cdn.jsdelivr.net/leaflet/1.0.0-rc.3/leaflet.js"></script>
+
+    <!-- ESRI leaflet for handling ESRI ocean basemap -->
+    <script src="https://unpkg.com/esri-leaflet@2.0.3"></script>
+    <script src="https://unpkg.com/esri-leaflet-vector@1.0.2"></script>
+
+    <!-- Javascript for manipulating notifications -->
+    <script src="/assets/js/notifications.js"></script>
+
+    <!-- Javascript to handle location control in map (the little blue dot showing where you are!) -->
+    <script src="https://domoritz.github.io/leaflet-locatecontrol/dist/L.Control.Locate.min.js" charset="utf-8"></script>
+    
+    <!-- Javascript for leaflet specific to this project -->
+    <!-- (requires notifications.js) -->
+    <script src="/assets/js/leaflet_local.js"></script>
+    <script src="/assets/js/leaflet.rotatedMarker.js"></script>
+    <script src="/assets/js/imagetile_handler.js"></script>
+
+    <script>
+            $().ready(function () {
+                // initialize map with or without notifications
+                let divTag = 'leaflet_map';
+                let doNotification = true;
+                leaflet_local.initMap(divTag,doNotification);
+            });
+    </script>
+<% end %>

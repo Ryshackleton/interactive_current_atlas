@@ -1,0 +1,29 @@
+
+<!-- load the template layout -->
+<% extend 'layout.ect' %>
+
+<!-- main page content -->
+    <div id="map"></div>
+
+<% block 'local_css' : %>
+    <!--  CSS for Google Maps sizing     -->
+    <link href="/assets/css/gmaps.css" rel="stylesheet" />
+<% end %>
+
+<% block 'page_scripts' : %>
+  <!--  Google Maps Plugin    -->
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDNXq86smJ57bYHvUZ5s-n4batu9rtcRG0"></script>
+
+  <!-- Javascript for manipulating notifications -->
+  <script src="/assets/js/notifications.js"></script>
+
+  <!-- Javascript for manipulating google maps objects -->
+  <!-- (requires notifications.js) -->
+  <script src="/assets/js/gmaps.js"></script>
+
+  <script>
+      $().ready(function(){
+          gmaps.initGoogleMaps();
+      });
+  </script>
+<% end %>

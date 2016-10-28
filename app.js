@@ -1,15 +1,15 @@
-var express = require('express');
-var engine = require('ejs-locals');
-var path = require('path');
+var express = require('express')
+  , ECT = require('ect')
+  , path = require('path')
 
-var routes = require('./routes/index');
+  , routes = require('./routes/all')
 
-var app = express();
+  , app = express();
 
-// view engine
-app.set('views', path.join(__dirname, 'views' ));
-app.engine('ejs', engine);
-app.set('view engine', 'ejs');
+var ectRenderer = ECT({watch: true, root:__dirname+'/views', ext: '.ect' });
+
+app.set('view engine', 'ect');
+app.engine('ect', ectRenderer.render);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -32,12 +32,17 @@ if( app.get('env') === 'development' ) {
   });
 }
 
-//app.get('/', function(request,response) {
-//    response.sendFile(__dirname + "/public/index.html");
-//    response.end();
-//});
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+      res.status(err.status || 500);
+      res.render('error', {
+                message: err.message,
+                error: {}
+            });
+});
 
+// make our app exportable,
+// app.listen(8000) called from bin/www
+module.exports = app
 
-// make our app an exportable,
-// app.listen(8000) will be called from bin/www
-module.exports = app;
