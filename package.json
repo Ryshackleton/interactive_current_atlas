@@ -4,12 +4,21 @@
   "description": "A web app to visualize tidal currents in the Salish Sea",
   "main": "index.js",
   "scripts": {
-    "test": "NODE_ENV=test mocha test.js",
+    "test": "NODE_ENV=test mocha -w test.js",
     "start": "node bin/www"
   },
   "author": "Ryan Shackleton - ryan.shackleton@gmail.com",
   "license": "ISC",
   "dependencies": {
+    "ejs-locals": "https://registry.npmjs.org/ejs-locals/-/ejs-locals-1.0.2.tgz",
     "express": "^4.14.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ryshackleton/interactive_current_atlas.git"
+  },
+  "devDependencies": {
+    "mocha": "^3.1.2",
+    "supertest": "^2.0.1"
   }
 }

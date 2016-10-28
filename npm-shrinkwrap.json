@@ -52,6 +52,16 @@
       "from": "ee-first@1.1.1",
       "resolved": "https://registry.npmjs.org/ee-first/-/ee-first-1.1.1.tgz"
     },
+    "ejs": {
+      "version": "0.8.8",
+      "from": "ejs@>=0.8.0 <0.9.0",
+      "resolved": "https://registry.npmjs.org/ejs/-/ejs-0.8.8.tgz"
+    },
+    "ejs-locals": {
+      "version": "1.0.2",
+      "from": "https://registry.npmjs.org/ejs-locals/-/ejs-locals-1.0.2.tgz",
+      "resolved": "https://registry.npmjs.org/ejs-locals/-/ejs-locals-1.0.2.tgz"
+    },
     "encodeurl": {
       "version": "1.0.1",
       "from": "encodeurl@>=1.0.1 <1.1.0",
