@@ -36,7 +36,7 @@ progress_spinner = {
             , shadow: false // Whether to render a shadow
             , hwaccel: false // Whether to use hardware acceleration
             , position: 'absolute' // Element positioning
-        }
+        };
     },
 
     /** creates a spinner on the target div (e.g. 'div_with_map')

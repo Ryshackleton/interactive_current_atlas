@@ -4,11 +4,11 @@ var express = require('express')
 
 // default map using leaflet (also home or index)
 var renderLeaflet = function(request,response){
-    response.render('leaflet_map'
-      , { paneltitle: 'Interactive Current Atlas (Leaflet)',
-      leafletactive: 'class=active',
-      mapsactive: '' });
-  };
+  response.render('leaflet_map' 
+    , { paneltitle: 'Interactive Current Atlas (Leaflet)', leafletactive: 'class=active', mapsactive: ''
+    });
+};
+
 router.route('/')
   .get(renderLeaflet);
 router.route('/maps_leaflet')
@@ -17,10 +17,7 @@ router.route('/maps_leaflet')
 // google map
 router.route('/maps_google')
   .get(function(request,response){
-    response.render('gmaps', { paneltitle: 'Interactive Current Atlas: (Google Map)',
-      leafletactive: '',
-      mapsactive: 'class=active'
-    });
+    response.render('gmaps', { paneltitle: 'Interactive Current Atlas: (Google Map)', leafletactive: '', mapsactive: 'class=active' });
   });
 
 module.exports = router;

@@ -5,7 +5,7 @@
 
 leaflet_local = (function () {
 
-    <!-- some constants -->
+    // some constants 
     const DEFAULT_LOCATION = [47.538178, -122.493966]; // default location, centered over Blake Island in Puget Sound at the moment
 
     return {
