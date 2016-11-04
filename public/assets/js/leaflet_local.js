@@ -98,14 +98,14 @@ leaflet_local = (function () {
 
                 // navigational charts, will be transparent and always as an optional overlay
                 let navCharts = L.esri.imageMapLayer({
-                    url: 'http://seamlessrnc.nauticalcharts.noaa.gov/arcgis/rest/services/RNC/NOAA_RNC/ImageServer',
+                    url: 'https://seamlessrnc.nauticalcharts.noaa.gov/arcgis/rest/services/RNC/NOAA_RNC/ImageServer',
                     opacity: 0.35,
                     transparent: true,
                     zindex: 2
                 });
 
-                let OpenSeaMap = L.tileLayer('http://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
-                    attribution: 'Map data: &copy; <a href="http://www.openseamap.org">OpenSeaMap</a> contributors'
+                let OpenSeaMap = L.tileLayer('https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png', {
+                    attribution: 'Map data: &copy; <a href="https://www.openseamap.org">OpenSeaMap</a> contributors'
                 });
 
                 // BUILD BASEMAP GROUP
@@ -138,7 +138,7 @@ leaflet_local = (function () {
 
                 // add a location controller to the map (adds a little blue dot with your current location)
                 // from https://github.com/domoritz/leaflet-locatecontrol
-                L.control.locate().addTo(map);
+                L.control.locate({ keepCurrentZoomLevel: true, flyTo: true }).addTo(map);
 
                 return map;
             }
