@@ -1,5 +1,5 @@
 var request = require('supertest');
-var app = require('./app');
+var app = require('./main');
 
 describe('Requests to the root path', function () {
 

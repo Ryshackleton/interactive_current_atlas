@@ -2,10 +2,10 @@
   "name": "interactive_current_atlas",
   "version": "0.0.1",
   "description": "A web app to visualize tidal currents in the Salish Sea",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "NODE_ENV=test mocha -w test.js",
-    "start": "node bin/www"
+    "start": "node ./bin/www"
   },
   "author": "Ryan Shackleton - ryan.shackleton@gmail.com",
   "license": "ISC",
