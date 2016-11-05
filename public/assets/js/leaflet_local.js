@@ -98,7 +98,7 @@ leaflet_local = (function () {
 
                 // navigational charts, will be transparent and always as an optional overlay
                 let navCharts = L.esri.imageMapLayer({
-                  url: 'https://seamlessrnc.nauticalcharts.noaa.gov/arcgis/rest/services/RNC/NOAA_RNC/MapServer',
+                  url: 'https://seamlessrnc.nauticalcharts.noaa.gov/arcgis/rest/services/RNC/NOAA_RNC/ImageServer',
                     opacity: 0.35,
                     transparent: true,
                     zindex: 2
