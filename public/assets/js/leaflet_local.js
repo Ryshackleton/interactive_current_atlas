@@ -111,9 +111,9 @@ leaflet_local = (function () {
                 // BUILD BASEMAP GROUP
                 let baseMaps = {
                     // "OSM Street Map" : streetMap,
-                    "Satellite": satelliteLayer,
-                    "Topographic (Bathymetry)": usaTopo,
                     "Shaded Relief (Bathymetry)": oceanLayer,
+                    "Topographic (Bathymetry)": usaTopo,
+                    "Satellite": satelliteLayer,
                 };
 
                 // BUILD OVERLAY GROUP
