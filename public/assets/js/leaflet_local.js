@@ -91,14 +91,14 @@ leaflet_local = (function () {
 
                 // BATHYMETRY AND NAVIGATION
                 // basic esri ocean, collating all labels to one layergroup
-                let oceanLayer = L.layerGroup([L.esri.basemapLayer('Oceans'), L.esri.basemapLayer('OceansLabels')]);
+                let oceanLayer = L.esri.basemapLayer('Oceans');
 
                 // topo layer, which has contour lines showing bathymetry at some zoom levels
                 let usaTopo = L.esri.basemapLayer('USATopo');
 
                 // navigational charts, will be transparent and always as an optional overlay
                 let navCharts = L.esri.imageMapLayer({
-                    url: 'https://seamlessrnc.nauticalcharts.noaa.gov/arcgis/rest/services/RNC/NOAA_RNC/ImageServer',
+                  url: 'https://seamlessrnc.nauticalcharts.noaa.gov/arcgis/rest/services/RNC/NOAA_RNC/MapServer',
                     opacity: 0.35,
                     transparent: true,
                     zindex: 2
