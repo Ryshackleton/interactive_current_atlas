@@ -1,10 +1,18 @@
 var express = require('express')
-  , ECT = require('ect')
-  , path = require('path')
+    , ECT = require('ect')
+    , path = require('path')
 
-  , routes = require('./routes/all')
+    , routes = require('./routes/all')
 
-  , app = express();
+    , bodyParser = require('body-parser')
+
+    , app = express();
+
+//parse application/json and look for raw text
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.text());
+app.use(bodyParser.json({ type: 'application/json'}));
 
 var ectRenderer = ECT({watch: true, root:__dirname+'/views', ext: '.ect' });
 
@@ -15,31 +23,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 
-app.use(function(req,res,next) {
-  var err = new Error('Not Found');
-  err.status = 404;
-  next(err);
-});
-
-// dev error handler
-if( app.get('env') === 'development' ) {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500 );
-    res.render('error', {
-      message: err.message,
-      error: err
+app.use(function(req,res)
+{
+  res.status(404)
+    .render('error',
+    {
+      message: 'Not found',
+      error: 'Error'
     });
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-      res.status(err.status || 500);
-      res.render('error', {
-                message: err.message,
-                error: {}
-            });
 });
 
 // make our app exportable,

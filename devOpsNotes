@@ -1,0 +1,11 @@
+
+Using netcdf4 git repository to parse netcdf classic files: https://github.com/swillner/netcdf4-js
+  - to install, need to have libnetcdf binaries installed.  On OSX, I used homebrew to install via
+    the following instructions: http://mtpain.github.io/2015/02/04/netcdf-data-model.html
+    - on Linux, might need to use something else like: http://linuxbrew.sh/ or this script: https://gist.github.com/perrette/cd815d03830b53e24c82
+(previously tried this package to parse netcdf, but it didn't support parsing sub arrays: https://github.com/cheminfo-js/netcdfjs)
+
+Command to test watching main.js and test.js (could add other files obviously with the -w watch flag)
+./node_modules/mocha/bin/mocha -w main.js test.js 
+
+

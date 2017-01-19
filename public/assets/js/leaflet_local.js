@@ -2,7 +2,6 @@
  * Created by ryshackleton on 9/14/16.
  */
 
-
 leaflet_local = (function () {
 
     // some constants 
@@ -142,13 +141,13 @@ leaflet_local = (function () {
 
                 return map;
             }
-
+            
             /**
              * method to test arrow icon rotation
              * @param theMap: map instance to add the arrows to
              */
             function setUpRotatingArrowExample(theMap) {
-                if (theMap == undefined)
+                if (theMap === undefined)
                     return;
 
                 // set up a clickable
