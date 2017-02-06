@@ -11,7 +11,12 @@ var renderLeaflet = function(request,response){
 };
 
 router.route('/')
-  .get(renderLeaflet);
+    .get(function(request,response)
+    {
+        response.render('index.html');
+    });
+// router.route('/')
+//   .get(renderLeaflet);
 router.route('/maps_leaflet')
   .get(renderLeaflet);
 
@@ -22,31 +27,37 @@ router.route('/maps_google')
   });
 
 router.route('/netcdf/:daynum/:varname/:time/:siglay')
-.get(function(request,response)
-{
-  try {
-    return response.json(netcdfhdl.getNodeLevelVariable(request.params));
-  }
-  catch (e)
+  .get(function(request,response)
   {
-    response.status(400).send('Bad Request: '+e.message);
-  }
-});
+    try {
+      return response.json(netcdfhdl.getNodeLevelVariable(request.params));
+    }
+    catch (e)
+    {
+      response.status(400).send('Bad Request: '+e.message);
+    }
+  });
 
 // sample call to parse x,y,attribute data
 router.route('/netcdf/:daynum/:varname')
-.get(
-     function(request,response)
- {
-   try
+  .get( function(request,response)
    {
-     return response.json(netcdfhdl.getTopLevelArrayVariable(request.params.daynum,request.params.varname));
-   }
-   catch(e)
-   {
-     response.status(400).send('Bad Request: '+e.message);
-   }
-});
+     try
+     {
+       return response.json(netcdfhdl.getTopLevelArrayVariable(request.params.daynum,request.params.varname));
+     }
+     catch(e)
+     {
+       response.status(400).send('Bad Request: '+e.message);
+     }
+   });
+
+
+router.route('/xyjson/')
+  .get(function(request,response)
+    {
+      response.json(netcdfhdl.coordsAsGeoJSON());
+    });
 
 module.exports = router;
 

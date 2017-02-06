@@ -14,9 +14,10 @@ leaflet_local = (function () {
          *
          * @param mapDivTag: name of the div tag in html to add the map to
          * @param doNotify: true/false flag to indicate whether to send popup notifications to the user
+         * @param callback: callback function to call on the newly inititated map object - callback(map)
          * @return none
          */
-        initMap: function (mapDivTag, doNotify) {
+        initMap: function (mapDivTag, doNotify, callback) {
 
             let myspin = progress_spinner.startSpinnerOnDiv(mapDivTag); // geolocation takes a sec, start progress spin
 
@@ -36,7 +37,8 @@ leaflet_local = (function () {
                     // kill running spinner
                     myspin.stop();
 
-                    buildMap([position.coords.latitude, position.coords.longitude], 11);
+                    let map = buildMap([position.coords.latitude, position.coords.longitude], 11);
+                    callback(map);
                 }, function () {
                     if (doNotify) {
                         handleLocationNotification(notification, 'warning', 1000, "The geolocation service failed.");
@@ -45,7 +47,8 @@ leaflet_local = (function () {
                     // kill running spinner
                     myspin.stop();
 
-                    buildMap(DEFAULT_LOCATION, 11);
+                    let map = buildMap(DEFAULT_LOCATION, 11);
+                    callback(map);
                 });
             } else {
                 // handle notifications
@@ -56,7 +59,8 @@ leaflet_local = (function () {
                 // kill running spinner
                 myspin.stop();
 
-                buildMap(DEFAULT_LOCATION, 11);
+                let map = buildMap(DEFAULT_LOCATION, 11);
+                callback(map);
             }
 
 
@@ -117,8 +121,6 @@ leaflet_local = (function () {
 
                 // BUILD OVERLAY GROUP
                 let overlayMaps = {
-                    // "Currents: Lower Low Slack Tide" : lower_low_slack,
-                    // "Currents: Mid Tide Large Flood" : mid_large_flood,
                     "OpenSeaMap": OpenSeaMap,
                     "Detailed Navigation Charts": navCharts,
                 };
@@ -130,7 +132,7 @@ leaflet_local = (function () {
 
                 // CREATE MAP
                 // layers added to the map in the layers: array will be toggled on upon loading
-                let map = L.map(mapDivTag, {center: ll, zoom: zoomlevel, layers: [oceanLayer]});
+                let map = new L.map(mapDivTag, {center: ll, zoom: zoomlevel, layers: [oceanLayer]});
 
                 // add a layer control, which lets the user toggle between baseMaps and toggle on/off overlayMaps
                 L.control.layers(baseMaps, overlayMaps).addTo(map);
@@ -138,43 +140,98 @@ leaflet_local = (function () {
                 // add a location controller to the map (adds a little blue dot with your current location)
                 // from https://github.com/domoritz/leaflet-locatecontrol
                 L.control.locate({ keepCurrentZoomLevel: true, flyTo: true }).addTo(map);
-
+                
                 return map;
             }
-            
-            /**
-             * method to test arrow icon rotation
-             * @param theMap: map instance to add the arrows to
-             */
-            function setUpRotatingArrowExample(theMap) {
-                if (theMap === undefined)
-                    return;
+        },
+  
+        /**
+         * uses D3.js to overlay an SVG on the map object
+         * @param map: map instance to add the arrows to
+         * @return a reference to the map once building is complete
+         */
+        initD3Overlay: function(map)
+        {
+          if( map === undefined )
+            throw new TypeError("The leaflet map must be defined before calling leaflet_local.initD3Overlay");
+      
+          var svg = d3.select(map.getPanes().overlayPane).append("svg"),
+          g = svg.append("g").attr("class", "leaflet-zoom-hide");
 
-                // set up a clickable
-                let LeafIcon = L.Icon.extend({
-                    options: {
-                        message: '',
-                        iconSize: [32, 32],
-                        iconAnchor: [16, 5]
-                    }
-                });
-                let iconUrls = 'https://cdn1.iconfinder.com/data/icons/prettyoffice/32/',
-                    up = new LeafIcon({iconUrl: iconUrls + 'up.png'});
-
-                let degree = 0;
-
-                function onMapClick(e) {
-                    // popup
-                    //     .setLatLng(e.latlng)
-                    //     .setContent("You clicked the map at " + e.latlng.toString())
-                    //     .openOn(mymap);
-
-                    degree = degree + 10;
-                    let m = L.marker(e.latlng, {icon: up, draggable: false, rotationAngle: degree}).addTo(theMap);
-                }
-
-                theMap.on('click', onMapClick);
-            }
+          d3.json("/xyjson/", function(error, collection)
+          {
+              if( error ) throw error;
+              
+              d3.json("/netcdf/3/u/15/0", function(error, udata){
+                  d3.json("/netcdf/3/v/15/0", function(error,vdata)
+                  {
+                      if(error) throw error;
+                      
+                      var u = Object.keys(udata).map(function(k) { return +udata[k] });
+                      var v = Object.keys(vdata).map(function(k) { return +vdata[k] });
+                      
+                      var ptArray = JSON.parse(collection);
+                      /** Add a LatLng object to each item in the dataset */
+                      ptArray.features.forEach(function(d,i)
+                      {
+                          d.LatLng = new L.LatLng(d.geometry.coordinates[0], d.geometry.coordinates[1]);
+                          d.arrowRotation = 90.0 - (Math.atan2(v[i],u[i]) * 180.0 / Math.PI) ;
+                          d.arrowScale = Math.sqrt(u[i]*u[i] + v[i]*v[i]);
+                      });
+    
+                      var transform = d3.geo.transform({point: projectPoint})
+                          , path = d3.geo.path().projection(transform);
+    
+                      var feature = g.selectAll("arrow")
+                          .data(ptArray.features)
+                          .enter().append('text')
+                          .attr('font-family', 'FontAwesome')
+                          .attr('font-size', function(d)
+                          {
+                              return d.arrowScale * 1.5 + 'em'
+                          })
+                          .text(function(d)
+                          {
+                              return '\uf176'
+                          });
+    
+                      map.on("moveend", update);
+                      update();
+                      
+                      function  projectPoint (x,y)
+                      {
+                          var point = map.latLngToLayerPoint(new L.LatLng(x,y));
+                          this.stream.point(point.x, point.y);
+                      }
+                      function update()
+                      {
+                          var bounds = path.bounds(ptArray),
+                              topLeft = bounds[0],
+                              bottomRight = bounds[1];
+        
+                          svg .attr("width", bottomRight[0] - topLeft[0])
+                              .attr("height", bottomRight[1] - topLeft[1])
+                              .style("left", topLeft[0] + "px")
+                              .style("top", topLeft[1] + "px");
+        
+                          g .attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+        
+                          feature.attr("d", path);
+        
+                          feature.attr("transform",
+                              function(d)
+                              {
+                                  return "translate(" +
+                                      map.latLngToLayerPoint(d.LatLng).x + "," +
+                                      map.latLngToLayerPoint(d.LatLng).y + ")" +
+                                      " rotate(" + d.arrowRotation + ")";
+                              }
+                          )
+                      }
+                  });
+              });
+    
+          });
         }
     }
 })();

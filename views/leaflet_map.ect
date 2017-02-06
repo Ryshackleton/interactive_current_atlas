@@ -36,12 +36,15 @@
     <script src="/assets/js/leaflet.rotatedMarker.js"></script>
     <script src="/assets/js/imagetile_handler.js"></script>
 
+    <!-- D3 for rendering points and current vectors-->
+    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+
     <script>
             $().ready(function () {
                 // initialize map with or without notifications
                 let divTag = 'leaflet_map';
                 let doNotification = true;
-                leaflet_local.initMap(divTag,doNotification);
+                leaflet_local.initMap(divTag,doNotification,leaflet_local.initD3Overlay);
             });
     </script>
 <% end %>

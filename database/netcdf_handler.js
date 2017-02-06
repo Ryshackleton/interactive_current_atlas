@@ -2,7 +2,9 @@
  * Created by ryshackleton on 1/9/17.
  */
 
-var netcdf4 = require("netcdf4");
+var netcdf4 = require("netcdf4")
+  , converter = require('coordinator')
+  , utmToLatLong = converter('utm','latlong');
 
 /**
  * Gets an array of node level data (usually, the u,v,w vector components of current data)
@@ -49,19 +51,19 @@ netcdf4.getNodeLevelVariable = function(params)
     }
     else
     {
-      // This is the somewhat confusing "hyperslab" method of returning values in netcdf files
-      // https://www.unidata.ucar.edu/software/netcdf/docs/programming_notes.html#specify_hyperslab
-      // https://github.com/swillner/netcdf4-js
-      // each pair of parameters in sequence refers to (start index of the dimension, how many dimensions to include)
-      //  so here we're saying: start index of a given time increment (0-23), and include only 1 time slice,
-      //  ...then within that time slice, start at a given sigma layer (0-9) and include only 1 sigma layer,
-      //  ...then within that sigma layer, return all node values from 0..n nodes where n=9013.
+      /** This is the somewhat confusing "hyperslab" method of returning values in netcdf files
+       https://www.unidata.ucar.edu/software/netcdf/docs/programming_notes.html#specify_hyperslab
+       https://github.com/swillner/netcdf4-js
+       each pair of parameters in sequence refers to (start index of the dimension, how many dimensions to include)
+        so here we're saying: start index of a given time increment (0-23), and include only 1 time slice,
+        ...then within that time slice, start at a given sigma layer (0-9) and include only 1 sigma layer,
+        ...then within that sigma layer, return all node values from 0..n nodes where n=9013. */
       return myVar.readSlice(+params.time, 1, +params.siglay, 1, 0, myVar.dimensions[2].length);
     }
   }
   catch (e)
   {
-    // catch the generic error thrown by readSlice when data is invalid and display some more useful text
+    /** catch the generic error thrown by readSlice when data is invalid and display some more useful text */
     if( e.message === 'Operation not permitted' )
     {
       throw new Error('Invalid input. Check input parameters for non-numeric characters or invalid variable names');
@@ -99,17 +101,18 @@ netcdf4.getTopLevelArrayVariable = function(daynum,varname)
       throw new Error('Variable does not exist in the nefcdf file'); // just throw to self
     }
 
-    // This is the somewhat confusing "hyperslab" method of returning values in netcdf files
-    // https://www.unidata.ucar.edu/software/netcdf/docs/programming_notes.html#specify_hyperslab
-    // https://github.com/swillner/netcdf4-js
-    // each pair of parameters in sequence refers to (start index of the dimension, how many dimensions to include)
-    //  so here there is only 1 dimension of the data we're querying,
-    // so we start at index=0 and return all values up to the size (length) of the 0th dimension
+    /** This is the somewhat confusing "hyperslab" method of returning values in netcdf files
+     https://www.unidata.ucar.edu/software/netcdf/docs/programming_notes.html#specify_hyperslab
+     https://github.com/swillner/netcdf4-js
+     each pair of parameters in sequence refers to (start index of the dimension, how many dimensions to include)
+     so here there is only 1 dimension of the data we're querying,
+     so we start at index=0 and return all values up to the size (length) of the 0th dimension
+     */
     return  myVar.readSlice(0, myVar.dimensions[0].length);
   }
   catch (e)
   {
-    // catch the generic error thrown by readSlice when data is invalid and display some more useful text
+    /** catch the generic error thrown by readSlice when data is invalid and display some more useful text */
     if( e.message === 'Operation not permitted' )
     {
       throw new Error('Invalid input. Check input parameters for non-numeric characters or invalid variable names');
@@ -119,6 +122,22 @@ netcdf4.getTopLevelArrayVariable = function(daynum,varname)
       throw e;
     }
   }
+};
+
+netcdf4.coordsAsGeoJSON = function()
+{
+  var utmEastings = netcdf4.getTopLevelArrayVariable(1,'X');
+  var utmNorthings = netcdf4.getTopLevelArrayVariable(1,'Y');
+  var str = `{ "type": "FeatureCollection", "features": [`;
+  utmEastings.forEach(function(easting,i)
+  {
+    var latlong = utmToLatLong(utmNorthings[i], utmEastings[i], 10);
+    str = str + `{ "type": "Feature", "geometry": { "type": "Point", "coordinates": [ ${latlong.latitude}, ${latlong.longitude} ] }, "properties": { "name": "Salish Sea" } }`;
+    if( i !== utmEastings.length - 1 )
+      str = str + `,`;
+  });
+  str = str + `] }`;
+  return str;
 };
 
 module.exports = netcdf4;

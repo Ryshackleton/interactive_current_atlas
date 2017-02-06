@@ -2,7 +2,9 @@ var request = require('supertest')
   , app = require('./main')
   , chai = require('chai')
   , should = chai.should()
-  , chaiHttp = require('chai-http');
+  , chaiHttp = require('chai-http')
+  , netcdfhdl = require('./database/netcdf_handler');
+
 chai.use(chaiHttp);
 
 describe('Requests to the root path', function ()
@@ -515,4 +517,31 @@ describe('Calls to retrieve netcdf data: get subgroup data - siglay variable val
       });
     })(i)
   }
+});
+
+describe('Calls to retrieve netcdf data: get GeoJSON data', function()
+{
+  it('Call to xyjson returns a json object with a bunch of stuff: /xyjson', function(done)
+  {
+    chai.request(app)
+      .get('/xyjson')
+      .end(function(err, res)
+      {
+        // console.log(res.body);
+        // there should be no errors
+        should.not.exist(err);
+        // there should be a 200 status code
+        res.status.should.equal(200);
+        // the response should be JSON
+        res.type.should.equal('application/json');
+        should.exist(res.body);
+        var parsed = Object.keys(res.body).map(function(k)
+        {
+          console.log(res.body[k]);
+          return res.body[k];
+        });
+        parsed.length.should.equal(9013);
+        done();
+      });
+  });
 });
